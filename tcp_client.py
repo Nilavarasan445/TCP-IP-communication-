@@ -1,11 +1,16 @@
 import socket
 from protocols import Protocol
+from tcp_protocol import TCPProtocol
 
 class TCPClient:
     def __init__(self, host=socket.gethostname(), port=9999, protocol: Protocol = None, use_stub=False):
         self.host = host
         self.port = port
         self.use_stub = use_stub
+        self.protocol = protocol
+
+        if not self.use_stub and self.protocol is None:
+            raise ValueError("A protocol instance must be provided if use_stub is False.")
 
     def connect(self):
         if not self.use_stub:
@@ -31,7 +36,7 @@ class TCPClient:
 
 def connect_multiple_clients(use_stub=False):
     for i in range(5):
-        client = TCPClient(use_stub=use_stub)
+        client = TCPClient(use_stub=use_stub, protocol=TCPProtocol())
         client.connect()
         client.send_data(f"READ: Connection Request from client {i + 1}")
         client.send_data(f"WRITE: Connection Request from client {i + 1}")
